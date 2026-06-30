@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة معلومات تحليل الحجوزات الفندقية | جامعة الزعيم الأزهري</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="dashboard_data.js"></script>
+<style>
+  :root{ --green:#2e7d32; --blue:#1565c0; --orange:#ef6c00; --teal:#00838f; --bg:#f4f6fa; --card:#fff; --ink:#1f2733; --muted:#6b7686; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(135deg,#0d3b66,#1565c0);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 14px rgba(0,0,0,.15)}
+  header img{height:62px;width:62px;object-fit:contain;background:#fff;border-radius:10px;padding:5px}
+  header .ttl{flex:1;text-align:center}
+  header h1{margin:0;font-size:21px;font-weight:800}
+  header p{margin:4px 0 0;font-size:13px;opacity:.9}
+  .wrap{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:8px}
+  .kpi{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(20,40,80,.06);border-top:4px solid var(--blue)}
+  .kpi:nth-child(2){border-color:var(--green)} .kpi:nth-child(3){border-color:var(--orange)}
+  .kpi:nth-child(4){border-color:var(--teal)} .kpi:nth-child(5){border-color:#7b1fa2} .kpi:nth-child(6){border-color:#c62828}
+  .kpi .v{font-size:26px;font-weight:800;line-height:1.1}
+  .kpi .l{font-size:13px;color:var(--muted);margin-top:6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  .card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(20,40,80,.07)}
+  .card.full{grid-column:1/-1}
+  .card h3{margin:0 0 4px;font-size:17px;color:#0d3b66}
+  .card .sub{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+  .chartbox{position:relative;height:300px}
+  .chartbox.tall{height:420px}
+  .insight{background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:14px;line-height:1.9}
+  .insight b{color:var(--orange)}
+  .legend2{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;margin:8px 0 2px}
+  .legend2 span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+  input[type=search],select{padding:8px 12px;border:1px solid #d4dae3;border-radius:9px;font-family:inherit;font-size:13.5px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:9px 11px;text-align:right;border-bottom:1px solid #eef1f5}
+  th{background:#0d3b66;color:#fff;cursor:pointer;position:sticky;top:0;white-space:nowrap}
+  th:hover{background:#1565c0}
+  tbody tr:hover{background:#f0f6ff}
+  .badge{padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .b-hi{background:#fdecea;color:#c62828}   /* low occ / high price */
+  .b-lo{background:#e8f5e9;color:#2e7d32}   /* high occ / low price */
+  .b-mid{background:#eef1f5;color:#5a6675}
+  .tablewrap{max-height:520px;overflow:auto;border-radius:10px;border:1px solid #eef1f5}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;padding:24px}
+  @media(max-width:760px){ .grid{grid-template-columns:1fr} header h1{font-size:16px} }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo_college.jpg" alt="كلية علوم الحاسوب">
+  <div class="ttl">
+    <h1>لوحة معلومات تحليل الحجوزات الفندقية</h1>
+    <p>الإشغال والمبيعات خلال المواسم والأحداث — آلية التسعير الذكي · <span id="period"></span></p>
+  </div>
+  <img src="logo_university.jpg" alt="جامعة الزعيم الأزهري">
+</header>
+
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>الأداء الشهري — المبيعات والإشغال</h3>
+      <div class="sub">المبيعات (أعمدة) مقابل معدل الإشغال (خط)</div>
+      <div class="chartbox"><canvas id="chMonthly"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>أثر نوع اليوم</h3>
+      <div class="sub">أحداث فعلية مقابل أيام عادية مقابل رمضان (بعد فصل رمضان كموسم)</div>
+      <div class="chartbox"><canvas id="chDaytype"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>القنوات البيعية — عدد الحجوزات</h3>
+      <div class="sub">توزيع الحجوزات حسب القناة</div>
+      <div class="chartbox"><canvas id="chChanB"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>القنوات البيعية — المبيعات</h3>
+      <div class="sub">توزيع المبيعات حسب القناة (ريال)</div>
+      <div class="chartbox"><canvas id="chChanS"></canvas></div>
+    </div>
+
+    <div class="card full">
+      <h3>⭐ العلاقة بين الإشغال ومتوسط سعر الليلة (ADR) — جوهر التحليل</h3>
+      <div class="sub">كل فقاعة = شقة · المحور الأفقي: الإشغال % · المحور الرأسي: متوسط سعر الليلة · حجم الفقاعة: حجم المبيعات</div>
+      <div class="legend2">
+        <span><i class="dot" style="background:#c62828"></i> إشغال منخفض / سعر مرتفع (مبيعات عالية رغم الإشغال المنخفض)</span>
+        <span><i class="dot" style="background:#2e7d32"></i> إشغال مرتفع / سعر منخفض (مبيعات منخفضة رغم الإشغال العالي)</span>
+        <span><i class="dot" style="background:#90a4ae"></i> متوازنة</span>
+      </div>
+      <div class="chartbox tall"><canvas id="chScatter"></canvas></div>
+      <div class="insight">
+        <b>قراءة مهمة:</b> العلاقة بين الإشغال والمبيعات ليست طردية دائماً، بل يتوسّطها <b>متوسط سعر الليلة</b>.
+        فالشقة <b>D1 - Alnarjis</b> إشغالها 42% فقط لكن مبيعاتها مرتفعة لأن سعر الليلة فيها ≈ 826 ريالاً،
+        بينما الشقة <b>Taleed Hitten - E32</b> إشغالها 100% ومبيعاتها منخفضة لأن سعر الليلة فيها ≈ 264 ريالاً.
+        لذلك يجب أن يقوم القرار السعري على ثلاثية: الإشغال + سعر الليلة + المبيعات معاً.
+      </div>
+    </div>
+
+    <div class="card full">
+      <h3>تفصيل أداء الشقق</h3>
+      <div class="sub">ابحث، صنّف حسب النمط، أو رتّب بالضغط على رأس العمود</div>
+      <div class="controls">
+        <input type="search" id="q" placeholder="🔎 ابحث باسم الشقة أو المشروع…">
+        <select id="fpat">
+          <option value="">كل الأنماط</option>
+          <option value="low_occ_high_price">إشغال منخفض / سعر مرتفع</option>
+          <option value="high_occ_low_price">إشغال مرتفع / سعر منخفض</option>
+          <option value="balanced">متوازنة</option>
+        </select>
+        <span id="count" style="color:var(--muted);font-size:13px"></span>
+      </div>
+      <div class="tablewrap">
+        <table id="tbl">
+          <thead><tr>
+            <th data-k="unit">الشقة</th><th data-k="project">المشروع</th>
+            <th data-k="occ">الإشغال %</th><th data-k="sales">المبيعات (ريال)</th>
+            <th data-k="adr">سعر الليلة (ريال)</th><th data-k="nights">الليالي</th>
+            <th data-k="pattern">النمط</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <footer>
+    أُعدّت هذه اللوحة من بيانات الحجوزات الفعلية (يناير–مارس 2026) · جامعة الزعيم الأزهري — كلية علوم الحاسوب وتقانة المعلومات ·
+    إعداد الطالب وضاح الحاج
+  </footer>
+</div>
+
+<script>
+const D = window.DASH;
+const fmt = n => n.toLocaleString('en-US');
+const GREEN='#2e7d32', BLUE='#1565c0', ORANGE='#ef6c00', TEAL='#00838f', GREY='#90a4ae', RED='#c62828';
+Chart.defaults.font.family = "'Segoe UI',Tahoma,Arial,sans-serif";
+Chart.defaults.font.size = 13;
+
+document.getElementById('period').textContent = D.period;
+
+// KPIs
+const kpis = [
+ ['إجمالي المبيعات', fmt(D.kpi.sales)+' ﷼'],
+ ['معدل الإشغال العام', D.kpi.occ+'%'],
+ ['متوسط سعر الليلة', fmt(Math.round(D.kpi.adr))+' ﷼'],
+ ['عدد الشقق الفعّالة', D.kpi.units],
+ ['الحجوزات المؤكدة', fmt(D.kpi.bookings)],
+ ['الحجوزات الملغاة', fmt(D.kpi.canceled)],
+];
+document.getElementById('kpis').innerHTML = kpis.map(k=>`<div class="kpi"><div class="v">${k[1]}</div><div class="l">${k[0]}</div></div>`).join('');
+
+// Monthly: bars(sales) + line(occ)
+new Chart(chMonthly,{data:{labels:D.monthly.map(m=>m.label),
+ datasets:[
+  {type:'bar',label:'المبيعات (ريال)',data:D.monthly.map(m=>m.sales),backgroundColor:[GREEN,GREY,BLUE],yAxisID:'y',borderRadius:6},
+  {type:'line',label:'الإشغال %',data:D.monthly.map(m=>m.occ),borderColor:ORANGE,backgroundColor:ORANGE,yAxisID:'y1',tension:.3,pointRadius:5,borderWidth:3}
+ ]},
+ options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},
+  scales:{y:{position:'right',title:{display:true,text:'المبيعات'},ticks:{callback:v=>(v/1000)+'k'}},
+          y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false},title:{display:true,text:'الإشغال %'}}}}});
+
+// Day type
+new Chart(chDaytype,{data:{labels:D.daytype.map(d=>d.label),
+ datasets:[
+  {type:'bar',label:'متوسط المبيعات اليومية',data:D.daytype.map(d=>d.sales),backgroundColor:[GREEN,BLUE,ORANGE],yAxisID:'y',borderRadius:6},
+  {type:'line',label:'الإشغال %',data:D.daytype.map(d=>d.occ),borderColor:'#c62828',backgroundColor:'#c62828',yAxisID:'y1',tension:.3,pointRadius:5,borderWidth:3}
+ ]},
+ options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},
+  scales:{y:{position:'right',ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}});
+
+// Channels bookings
+const ch = D.channels.filter(c=>c.bookings>0).slice(0,7);
+new Chart(chChanB,{type:'bar',data:{labels:ch.map(c=>c.name),
+ datasets:[{label:'حجوزات',data:ch.map(c=>c.bookings),backgroundColor:BLUE,borderRadius:5}]},
+ options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+const chs = [...D.channels].filter(c=>c.sales>0).sort((a,b)=>b.sales-a.sales).slice(0,7);
+new Chart(chChanS,{type:'bar',data:{labels:chs.map(c=>c.name),
+ datasets:[{label:'مبيعات',data:chs.map(c=>c.sales),backgroundColor:GREEN,borderRadius:5}]},
+ options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},
+  scales:{x:{ticks:{callback:v=>(v/1000)+'k'}}}}});
+
+// Scatter occ vs adr, bubble=sales
+const colByPat = p => p==='low_occ_high_price'?RED : p==='high_occ_low_price'?GREEN : GREY;
+const bub = D.units.map(u=>({x:u.occ,y:u.adr,r:Math.max(4,Math.sqrt(u.sales)/16),unit:u.unit,sales:u.sales,pat:u.pattern}));
+new Chart(chScatter,{type:'bubble',data:{datasets:[{data:bub,
+  backgroundColor:bub.map(b=>colByPat(b.pat)+'cc'),borderColor:'#555',borderWidth:.5}]},
+ options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+   tooltip:{callbacks:{label:c=>{const b=c.raw;return `${b.unit}: إشغال ${b.x}% · سعر الليلة ${b.y} ﷼ · مبيعات ${fmt(b.sales)} ﷼`;}}}},
+  scales:{x:{title:{display:true,text:'الإشغال %'},min:0,max:108},
+          y:{title:{display:true,text:'متوسط سعر الليلة (ريال)'},min:180}}}});
+
+// Table
+const patLabel = {low_occ_high_price:['إشغال منخفض / سعر مرتفع','b-hi'],high_occ_low_price:['إشغال مرتفع / سعر منخفض','b-lo'],balanced:['متوازنة','b-mid']};
+let sortK='sales', sortDir=-1;
+const tb = document.querySelector('#tbl tbody');
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const fp=document.getElementById('fpat').value;
+  let rows=D.units.filter(u=>(!q || u.unit.toLowerCase().includes(q)||(u.project||'').toLowerCase().includes(q)) && (!fp||u.pattern===fp));
+  rows.sort((a,b)=>{const x=a[sortK],y=b[sortK];return (x>y?1:x<y?-1:0)*sortDir;});
+  tb.innerHTML = rows.map(u=>{const pl=patLabel[u.pattern];
+    return `<tr><td><b>${u.unit}</b></td><td>${u.project||''}</td><td>${u.occ}%</td>
+    <td>${fmt(u.sales)}</td><td>${fmt(u.adr)}</td><td>${u.nights}</td>
+    <td><span class="badge ${pl[1]}">${pl[0]}</span></td></tr>`;}).join('');
+  document.getElementById('count').textContent = rows.length+' شقة';
+}
+document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortDir=(sortK===k)?-sortDir:-1;sortK=k;render();});
+document.getElementById('q').oninput=render;
+document.getElementById('fpat').onchange=render;
+render();
+</script>
+</body>
+</html>
