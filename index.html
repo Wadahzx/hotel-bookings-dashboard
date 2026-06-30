@@ -193,7 +193,7 @@ function monthlyChart(id){const m=byMonth();
   mk(id,{data:{labels:m.map(x=>x.lab),datasets:[
     {type:'bar',label:L().salesBar,data:m.map(x=>x.sales),backgroundColor:C.blue,borderRadius:5,yAxisID:'y',datalabels:{color:C.blue}},
     {type:'line',label:L().occLine,data:m.map(x=>x.occ),borderColor:C.orange,backgroundColor:C.orange,yAxisID:'y1',tension:.3,pointRadius:4,borderWidth:3,datalabels:{align:'bottom',offset:10,color:'#fff',backgroundColor:C.orange,borderRadius:4,padding:{top:1,bottom:1,left:4,right:4},font:{weight:'bold',size:10}}}]},
-   options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'right',ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}})}
+   options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'right',suggestedMax:2000000,ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}})}
 function cityOcc(id){const t=L();mk(id,{type:'bar',data:{labels:D.ramadan_city.map(c=>CITY[lang][c.city]),datasets:[
    {label:t.normalP,data:D.ramadan_city.map(c=>c.norm_occ),backgroundColor:C.blue,borderRadius:5},
    {label:t.ramadanP,data:D.ramadan_city.map(c=>c.ram_occ),backgroundColor:C.orange,borderRadius:5}]},
