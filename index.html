@@ -7,50 +7,44 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="dashboard_data.js"></script>
 <style>
-  :root{ --green:#2e7d32; --blue:#1565c0; --navy:#0d3b66; --orange:#ef6c00; --teal:#00838f; --red:#c62828;
-         --bg:#eef1f6; --card:#fff; --ink:#1f2733; --muted:#6b7686; }
+  :root{--green:#2e7d32;--blue:#1565c0;--navy:#0d3b66;--orange:#ef6c00;--teal:#00838f;--red:#c62828;
+        --bg:#eef1f6;--card:#fff;--ink:#1f2733;--muted:#6b7686}
   *{box-sizing:border-box}
   body{margin:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-  header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 14px rgba(0,0,0,.18)}
-  header img{height:54px;width:54px;object-fit:contain;background:#fff;border-radius:9px;padding:4px}
+  header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:13px 20px;display:flex;align-items:center;gap:15px;box-shadow:0 2px 14px rgba(0,0,0,.18)}
+  header img{height:52px;width:52px;object-fit:contain;background:#fff;border-radius:9px;padding:4px}
   header .ttl{flex:1;text-align:center}
-  header h1{margin:0;font-size:18px;font-weight:800}
-  header p{margin:3px 0 0;font-size:12.5px;opacity:.92}
-  .langbtn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:20px;
-           padding:7px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  header h1{margin:0;font-size:18px;font-weight:800}header p{margin:3px 0 0;font-size:12.5px;opacity:.92}
+  .langbtn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:20px;padding:7px 15px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
   .langbtn:hover{background:rgba(255,255,255,.28)}
-  nav{background:var(--card);box-shadow:0 1px 8px rgba(20,40,80,.08);display:flex;gap:4px;padding:0 14px;overflow-x:auto;position:sticky;top:0;z-index:20}
-  nav button{background:none;border:none;border-bottom:3px solid transparent;padding:14px 16px;font-size:14.5px;font-weight:700;
-             color:var(--muted);cursor:pointer;white-space:nowrap;font-family:inherit}
-  nav button.active{color:var(--blue);border-bottom-color:var(--blue)}
-  nav button:hover{color:var(--navy)}
+  nav{background:var(--card);box-shadow:0 1px 8px rgba(20,40,80,.08);display:flex;gap:2px;padding:0 12px;overflow-x:auto;position:sticky;top:0;z-index:20}
+  nav button{background:none;border:none;border-bottom:3px solid transparent;padding:13px 14px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:inherit}
+  nav button.active{color:var(--blue);border-bottom-color:var(--blue)}nav button:hover{color:var(--navy)}
+  .filterbar{background:#fff;border-bottom:1px solid #e6eaf0;padding:10px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;position:sticky;top:46px;z-index:19}
+  .filterbar label{font-size:13px;color:var(--muted);font-weight:700}
+  .filterbar select{padding:7px 11px;border:1px solid #d4dae3;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600}
+  .filterbar .chip{margin-inline-start:auto;font-size:12.5px;color:var(--muted)}
   .wrap{max-width:1180px;margin:0 auto;padding:18px 14px 60px}
-  .page{display:none} .page.active{display:block}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px}
   .kpi{background:var(--card);border-radius:13px;padding:15px;box-shadow:0 2px 9px rgba(20,40,80,.06);border-top:4px solid var(--blue)}
-  .kpi.g{border-color:var(--green)} .kpi.o{border-color:var(--orange)} .kpi.t{border-color:var(--teal)}
-  .kpi.p{border-color:#7b1fa2} .kpi.r{border-color:var(--red)}
-  .kpi .v{font-size:24px;font-weight:800;line-height:1.1} .kpi .l{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .kpi.g{border-color:var(--green)}.kpi.o{border-color:var(--orange)}.kpi.t{border-color:var(--teal)}.kpi.p{border-color:#7b1fa2}.kpi.r{border-color:var(--red)}
+  .kpi .v{font-size:23px;font-weight:800;line-height:1.1}.kpi .l{font-size:12.5px;color:var(--muted);margin-top:5px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
   .card{background:var(--card);border-radius:15px;padding:17px;box-shadow:0 2px 11px rgba(20,40,80,.07);margin-bottom:15px}
-  .card.full{grid-column:1/-1}
-  .card h3{margin:0 0 3px;font-size:16px;color:var(--navy)}
-  .card .sub{font-size:12px;color:var(--muted);margin-bottom:11px}
+  .card.full{grid-column:1/-1}.card h3{margin:0 0 3px;font-size:16px;color:var(--navy)}.card .sub{font-size:12px;color:var(--muted);margin-bottom:11px}
   .chartbox{position:relative;height:300px}.chartbox.tall{height:430px}
-  .insight{background:#fff8e1;border:1px solid #ffe082;border-radius:11px;padding:13px 15px;margin-top:13px;font-size:13.6px;line-height:1.85}
-  .insight b{color:var(--orange)}
-  .legend2{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:6px 0}
-  .legend2 span{display:inline-flex;align-items:center;gap:6px}.dot{width:11px;height:11px;border-radius:50%}
+  .insight{background:#fff8e1;border:1px solid #ffe082;border-radius:11px;padding:13px 15px;margin-top:13px;font-size:13.6px;line-height:1.85}.insight b{color:var(--orange)}
+  .legend2{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:6px 0}.legend2 span{display:inline-flex;align-items:center;gap:6px}.dot{width:11px;height:11px;border-radius:50%}
   .controls{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px;align-items:center}
-  input[type=search],select{padding:8px 11px;border:1px solid #d4dae3;border-radius:8px;font-family:inherit;font-size:13px}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{padding:8px 10px;border-bottom:1px solid #eef1f5}
-  html[dir=ltr] th,html[dir=ltr] td{text-align:left} html[dir=rtl] th,html[dir=rtl] td{text-align:right}
-  th{background:var(--navy);color:#fff;cursor:pointer;position:sticky;top:0;white-space:nowrap}
-  th:hover{background:var(--blue)} tbody tr:hover{background:#f0f6ff}
-  .badge{padding:3px 8px;border-radius:18px;font-size:11px;font-weight:700;white-space:nowrap}
-  .b-hi{background:#fdecea;color:var(--red)} .b-lo{background:#e8f5e9;color:var(--green)} .b-mid{background:#eef1f5;color:#5a6675}
+  input[type=search],select.tbl{padding:8px 11px;border:1px solid #d4dae3;border-radius:8px;font-family:inherit;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px 10px;border-bottom:1px solid #eef1f5}
+  html[dir=ltr] th,html[dir=ltr] td{text-align:left}html[dir=rtl] th,html[dir=rtl] td{text-align:right}
+  th{background:var(--navy);color:#fff;cursor:pointer;position:sticky;top:0;white-space:nowrap}th:hover{background:var(--blue)}tbody tr:hover{background:#f0f6ff}
+  .badge{padding:3px 8px;border-radius:18px;font-size:11px;font-weight:700;white-space:nowrap}.b-hi{background:#fdecea;color:var(--red)}.b-lo{background:#e8f5e9;color:var(--green)}.b-mid{background:#eef1f5;color:#5a6675}
   .tablewrap{max-height:500px;overflow:auto;border-radius:9px;border:1px solid #eef1f5}
+  .rec{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid #eef1f5;border-inline-start:5px solid var(--blue);border-radius:11px;padding:14px 16px;margin-bottom:11px}
+  .rec.up{border-inline-start-color:var(--green)}.rec.down{border-inline-start-color:var(--red)}.rec.warn{border-inline-start-color:var(--orange)}
+  .rec .ic{font-size:22px}.rec h4{margin:0 0 4px;font-size:15px}.rec p{margin:0;font-size:13.3px;color:#444;line-height:1.7}
   footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
   @media(max-width:760px){.grid{grid-template-columns:1fr}header h1{font-size:15px}}
 </style>
@@ -63,232 +57,206 @@
   <button class="langbtn" id="langbtn" onclick="toggleLang()">العربية</button>
 </header>
 <nav id="nav"></nav>
+<div class="filterbar">
+  <label id="lblCity"></label>
+  <select id="fCity" onchange="setFilter()"></select>
+  <label id="lblMonth"></label>
+  <select id="fMonth" onchange="setFilter()"></select>
+  <span class="chip" id="filterChip"></span>
+</div>
 <div class="wrap" id="content"></div>
 <footer id="footer"></footer>
 
 <script>
-const D = window.DASH;
-const fmt = n => Math.round(n).toLocaleString('en-US');
-const C = {green:'#2e7d32',blue:'#1565c0',navy:'#0d3b66',orange:'#ef6c00',teal:'#00838f',red:'#c62828',grey:'#90a4ae'};
-Chart.defaults.font.family="'Segoe UI',Tahoma,Arial,sans-serif"; Chart.defaults.font.size=12;
-
+const D=window.DASH;
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const C={green:'#2e7d32',blue:'#1565c0',navy:'#0d3b66',orange:'#ef6c00',teal:'#00838f',red:'#c62828',grey:'#90a4ae'};
+Chart.defaults.font.family="'Segoe UI',Tahoma,Arial,sans-serif";Chart.defaults.font.size=12;
 const MONTHS={en:['Jan','Feb','Mar','Apr','May','Jun'],ar:['يناير','فبراير','مارس','أبريل','مايو','يونيو']};
-const I18N={
- en:{dir:'ltr',title:'Hotel Bookings Analytics Dashboard',
-   sub:'Occupancy & sales across seasons and events — smart pricing · Jan–Jun 2026',
-   nav:['Overview','Sales','Occupancy','Events & Seasons','Pricing (ADR)','Cancellations'],
-   kpi:{sales:'Total Sales',occ:'Overall Occupancy',adr:'Avg Daily Rate (ADR)',units:'Active Units',bookings:'Confirmed Bookings',cancel:'Cancellations'},
-   sar:'SAR',
-   monthlyTitle:'Monthly Performance — Sales & Occupancy',monthlySub:'Sales (bars) vs occupancy rate (line)',
-   salesBar:'Sales (SAR)',occLine:'Occupancy %',
-   daytypeTitle:'Effect of Day Type',daytypeSub:'Real events vs ordinary days vs Ramadan (after separating Ramadan as a season)',
-   avgDaily:'Avg daily sales',
-   chanBTitle:'Bookings by Channel',chanBSub:'Number of bookings per channel',
-   chanSTitle:'Sales by Channel',chanSSub:'Sales (SAR) per channel',bookings:'Bookings',sales:'Sales',
-   topTitle:'Top 10 Apartments by Sales',topSub:'Highest revenue units',
-   occCityTitle:'Occupancy by City — Ramadan vs Normal',occCitySub:'Riyadh vs Al-Madinah',
-   ramTitle:'Ramadan Effect by City (the key seasonal insight)',
-   ramInsight:'During Ramadan, <b>Riyadh occupancy collapses</b> (68.8% → 36.1%) while <b>Al-Madinah rises</b> (57.2% → 67.5%) and its nightly rate jumps <b>+30%</b> (SAR 385 → 499). Recommendation: <b>raise Al-Madinah prices &amp; market them; lower Riyadh prices</b> in Ramadan.',
-   normalP:'Normal period',ramadanP:'Ramadan',
-   scatterTitle:'Occupancy vs. Average Daily Rate (ADR)',scatterSub:'Each bubble = an apartment · X: occupancy % · Y: ADR · bubble size = sales',
-   patHi:'Low occupancy / high price (high sales despite low occupancy)',patLo:'High occupancy / low price (low sales despite high occupancy)',patMid:'Balanced',
-   scatterInsight:'The occupancy–sales relationship is <b>not</b> always proportional — it is mediated by <b>ADR</b>. <b>Alarid-K10</b> is only 45% occupied yet sells SAR 54,801 (ADR ≈ 677); <b>Taleed Hitten-E32</b> is 98% occupied but sells SAR 47,720 (ADR ≈ 268). Price on the triad: occupancy + ADR + sales.',
-   tableTitle:'Apartment Performance Detail',tableSub:'Search, filter by pattern, or sort by clicking a column header',
-   search:'🔎 Search by apartment or project…',allPat:'All patterns',countUnit:'apartments',
-   colUnit:'Apartment',colProject:'Project',colCity:'City',colOcc:'Occupancy %',colSales:'Sales (SAR)',colAdr:'ADR (SAR)',colNights:'Nights',colPattern:'Pattern',
-   occCol:'Occupancy %',occSampleTitle:'Highest-Occupancy Apartments (sample)',
-   canKpiCount:'Cancelled bookings',canKpiNights:'Lost room-nights',canKpiLost:'Est. revenue at risk',canKpiRate:'Cancellation rate',
-   canMonthTitle:'Cancellations by Month',canChanTitle:'Cancellations by Channel',canCityTitle:'Cancellations by City',
-   canInsight:'<b>Booking.com</b> drives the most cancellations (176) despite far fewer bookings than Airbnb — review its cancellation/prepayment policy. Cancellations equal ~497k SAR of revenue at risk.',
-   footer:'Built from actual booking data (Jan–Jun 2026) · Al-Zaeem Al-Azhari University — Faculty of Computer Science & IT · Prepared by Wadah Alhag'},
- ar:{dir:'rtl',title:'لوحة معلومات تحليل الحجوزات الفندقية',
-   sub:'الإشغال والمبيعات خلال المواسم والأحداث — التسعير الذكي · يناير–يونيو 2026',
-   nav:['نظرة عامة','المبيعات','الإشغال','المواسم والأحداث','التسعير (ADR)','الإلغاءات'],
-   kpi:{sales:'إجمالي المبيعات',occ:'معدل الإشغال العام',adr:'متوسط سعر الليلة',units:'الشقق الفعّالة',bookings:'الحجوزات المؤكدة',cancel:'الحجوزات الملغاة'},
-   sar:'ريال',
-   monthlyTitle:'الأداء الشهري — المبيعات والإشغال',monthlySub:'المبيعات (أعمدة) مقابل معدل الإشغال (خط)',
-   salesBar:'المبيعات (ريال)',occLine:'الإشغال %',
-   daytypeTitle:'أثر نوع اليوم',daytypeSub:'أحداث فعلية مقابل أيام عادية مقابل رمضان (بعد فصل رمضان كموسم)',
-   avgDaily:'متوسط المبيعات اليومية',
-   chanBTitle:'الحجوزات حسب القناة',chanBSub:'عدد الحجوزات لكل قناة',
-   chanSTitle:'المبيعات حسب القناة',chanSSub:'المبيعات (ريال) لكل قناة',bookings:'حجوزات',sales:'مبيعات',
-   topTitle:'أعلى 10 شقق من حيث المبيعات',topSub:'الوحدات الأعلى إيراداً',
-   occCityTitle:'الإشغال حسب المدينة — رمضان مقابل العادي',occCitySub:'الرياض مقابل المدينة المنورة',
-   ramTitle:'أثر رمضان حسب المدينة (الرؤية الموسمية الأهم)',
-   ramInsight:'في رمضان <b>ينهار إشغال الرياض</b> (68.8% ← 36.1%) بينما <b>ترتفع المدينة المنورة</b> (57.2% ← 67.5%) ويقفز سعر ليلتها <b>+30%</b> (385 ← 499 ريال). التوصية: <b>ارفع أسعار المدينة وسوّقها، واخفض أسعار الرياض</b> في رمضان.',
-   normalP:'الفترة العادية',ramadanP:'رمضان',
-   scatterTitle:'الإشغال مقابل متوسط سعر الليلة (ADR)',scatterSub:'كل فقاعة = شقة · الأفقي: الإشغال % · الرأسي: سعر الليلة · حجم الفقاعة: المبيعات',
-   patHi:'إشغال منخفض / سعر مرتفع (مبيعات عالية رغم الإشغال المنخفض)',patLo:'إشغال مرتفع / سعر منخفض (مبيعات منخفضة رغم الإشغال العالي)',patMid:'متوازنة',
-   scatterInsight:'العلاقة بين الإشغال والمبيعات <b>ليست</b> طردية دائماً، بل يتوسطها <b>سعر الليلة</b>. <b>Alarid-K10</b> إشغالها 45% فقط لكنها تبيع 54,801 ريالاً (سعر الليلة ≈ 677)، و<b>Taleed Hitten-E32</b> إشغالها 98% لكنها تبيع 47,720 ريالاً (سعر الليلة ≈ 268). سعّر على الثلاثية: الإشغال + سعر الليلة + المبيعات.',
-   tableTitle:'تفصيل أداء الشقق',tableSub:'ابحث، صنّف حسب النمط، أو رتّب بالضغط على رأس العمود',
-   search:'🔎 ابحث باسم الشقة أو المشروع…',allPat:'كل الأنماط',countUnit:'شقة',
-   colUnit:'الشقة',colProject:'المشروع',colCity:'المدينة',colOcc:'الإشغال %',colSales:'المبيعات (ريال)',colAdr:'سعر الليلة',colNights:'الليالي',colPattern:'النمط',
-   occCol:'الإشغال %',occSampleTitle:'الشقق الأعلى إشغالاً (عينة)',
-   canKpiCount:'الحجوزات الملغاة',canKpiNights:'ليالٍ مفقودة',canKpiLost:'إيراد محتمل مفقود',canKpiRate:'نسبة الإلغاء',
-   canMonthTitle:'الإلغاءات حسب الشهر',canChanTitle:'الإلغاءات حسب القناة',canCityTitle:'الإلغاءات حسب المدينة',
-   canInsight:'<b>Booking.com</b> تتصدّر الإلغاءات (176) رغم أن حجوزاتها أقل بكثير من Airbnb — راجع سياسة الإلغاء/الدفع المسبق فيها. الإلغاءات تعادل نحو 497 ألف ريال إيراداً معرّضاً للخطر.',
-   footer:'أُعدّت من بيانات الحجوزات الفعلية (يناير–يونيو 2026) · جامعة الزعيم الأزهري — كلية علوم الحاسوب وتقانة المعلومات · إعداد وضاح الحاج'},
-};
 const CITY={en:{'Riyadh':'Riyadh','Al-madinah':'Al-Madinah'},ar:{'Riyadh':'الرياض','Al-madinah':'المدينة المنورة'}};
 
-let lang='en', page=0, charts=[];
-function L(){return I18N[lang];}
-function mlabels(){return D.monthly.map((m,i)=>MONTHS[lang][i]);}
-function destroyCharts(){charts.forEach(c=>c.destroy());charts=[];}
-function mk(ctx,cfg){const c=new Chart(ctx,cfg);charts.push(c);return c;}
+const I18N={
+ en:{dir:'ltr',title:'Hotel Bookings Analytics Dashboard',sub:'Occupancy, sales & smart pricing · Jan–Jun 2026',
+   nav:['Overview','Sales','Occupancy','Events & Seasons','Pricing (ADR)','Net Profit','Cancellations','Recommendations'],
+   city:'City',month:'Month',all:'All',sar:'SAR',showing:'Showing',
+   kSales:'Sales',kOcc:'Occupancy',kAdr:'ADR',kUnits:'Active Units',kNights:'Occupied Nights',kCancel:'Cancellations',kNet:'Net Profit',kMargin:'Net Margin',kFees:'Channel Fees',
+   monthlyT:'Monthly Performance — Sales & Occupancy',monthlyS:'Sales (bars) vs occupancy (line)',salesBar:'Sales (SAR)',occLine:'Occupancy %',
+   daytypeT:'Effect of Day Type',daytypeS:'Real events vs ordinary days vs Ramadan',avgDaily:'Avg daily sales',
+   chanST:'Sales by Channel',chanNT:'Net Profit by Channel (after fees & VAT)',sales:'Sales',net:'Net',topT:'Top 10 Apartments by Sales',
+   occCityT:'Occupancy by City — Ramadan vs Normal',occCityS:'Riyadh vs Al-Madinah',normalP:'Normal period',ramadanP:'Ramadan',
+   ramT:'Ramadan Effect by City (key seasonal insight)',
+   ramI:'During Ramadan, <b>Riyadh occupancy collapses</b> (68.8%→36.1%) while <b>Al-Madinah rises</b> (57.2%→67.5%) and its rate jumps <b>+30%</b>. Statistically: Riyadh drop p&lt;0.001; Al-Madinah rise p=0.129.',
+   scatterT:'Occupancy vs. Average Daily Rate (ADR)',scatterS:'Bubble = apartment · X: occupancy% · Y: ADR · size = sales',
+   patHi:'Low occupancy / high price',patLo:'High occupancy / low price',patMid:'Balanced',
+   scatterI:'Occupancy and sales are <b>not</b> always proportional — mediated by <b>ADR</b>. Alarid-K10: 45% occ yet SAR 54,801 (ADR 677); Taleed-E32: 98% occ but ADR 268.',
+   tableT:'Apartment Performance Detail',tableS:'Search, filter by pattern, sort by clicking a header',search:'🔎 Search…',allPat:'All patterns',countU:'apartments',
+   cUnit:'Apartment',cProj:'Project',cCity:'City',cOcc:'Occ %',cSales:'Sales',cNet:'Net',cAdr:'ADR',cPat:'Pattern',
+   occSampleT:'Highest-Occupancy Apartments (sample)',
+   netT:'Channel Profitability (Gross → Fees → Net)',netS:'Net = sales − channel fees − VAT',marginT:'Net Margin by Channel (%)',
+   netInsight:'<b>Manual-Ejar</b> has the highest margin (~97%, long-stay, tiny fees), while <b>Airbnb</b> dominates volume but pays ~15% commission. Evaluate channels by net, not gross.',
+   canT:'Cancellations',canMonthT:'Cancellations by Month',canChanT:'By Channel',canCityT:'By City',
+   canI:'<b>Booking.com</b> drives the most cancellations despite fewer bookings than Airbnb — review prepayment/cancellation policy.',
+   recsT:'Data-Driven Recommendations',
+   recs:[['up','📈','Raise prices on high-occupancy / low-price units','Units above 85% occupancy with ADR below the SAR 467 average can absorb a 10–15% price increase with little demand loss.'],
+        ['up','🕌','Al-Madinah in Ramadan: raise prices + market','Al-Madinah occupancy holds and ADR rises ~30% during Ramadan. Raise prices 20–30% and intensify marketing for Umrah demand.'],
+        ['down','🏙️','Riyadh in Ramadan: lower prices / promote','Riyadh occupancy collapses (−33pp, p<0.001). Lower prices 15–20% or run promotions to fill capacity.'],
+        ['up','🎯','Price on real events','Event days sell 36% more per day (p<0.001). Raise prices 15–20% on high-performing units during real events.'],
+        ['warn','🔁','Curb Booking.com cancellations','Booking.com leads cancellations (~497k SAR at risk). Require prepayment or stricter cancellation terms.'],
+        ['up','💰','Favour high-margin channels','Manual-Ejar nets ~97% vs Airbnb ~70%. Grow long-stay/direct channels to lift net profit.']],
+   footer:'Built from actual booking data (Jan–Jun 2026) · Al-Zaeem Al-Azhari University — Faculty of Computer Science & IT · Prepared by Wadah Alhag'},
+ ar:{dir:'rtl',title:'لوحة معلومات تحليل الحجوزات الفندقية',sub:'الإشغال والمبيعات والتسعير الذكي · يناير–يونيو 2026',
+   nav:['نظرة عامة','المبيعات','الإشغال','المواسم والأحداث','التسعير (ADR)','صافي الربح','الإلغاءات','التوصيات'],
+   city:'المدينة',month:'الشهر',all:'الكل',sar:'ريال',showing:'المعروض',
+   kSales:'المبيعات',kOcc:'الإشغال',kAdr:'سعر الليلة',kUnits:'الشقق الفعّالة',kNights:'ليالي الإشغال',kCancel:'الإلغاءات',kNet:'صافي الربح',kMargin:'هامش الربح',kFees:'عمولات القنوات',
+   monthlyT:'الأداء الشهري — المبيعات والإشغال',monthlyS:'المبيعات (أعمدة) مقابل الإشغال (خط)',salesBar:'المبيعات (ريال)',occLine:'الإشغال %',
+   daytypeT:'أثر نوع اليوم',daytypeS:'أحداث فعلية مقابل أيام عادية مقابل رمضان',avgDaily:'متوسط المبيعات اليومية',
+   chanST:'المبيعات حسب القناة',chanNT:'صافي الربح حسب القناة (بعد العمولات والضريبة)',sales:'مبيعات',net:'صافي',topT:'أعلى 10 شقق من حيث المبيعات',
+   occCityT:'الإشغال حسب المدينة — رمضان مقابل العادي',occCityS:'الرياض مقابل المدينة المنورة',normalP:'الفترة العادية',ramadanP:'رمضان',
+   ramT:'أثر رمضان حسب المدينة (الرؤية الموسمية الأهم)',
+   ramI:'في رمضان <b>ينهار إشغال الرياض</b> (68.8%←36.1%) بينما <b>ترتفع المدينة المنورة</b> (57.2%←67.5%) ويقفز سعرها <b>+30%</b>. إحصائياً: انخفاض الرياض p&lt;0.001؛ ارتفاع المدينة p=0.129.',
+   scatterT:'الإشغال مقابل متوسط سعر الليلة (ADR)',scatterS:'فقاعة = شقة · الأفقي: الإشغال% · الرأسي: السعر · الحجم = المبيعات',
+   patHi:'إشغال منخفض / سعر مرتفع',patLo:'إشغال مرتفع / سعر منخفض',patMid:'متوازنة',
+   scatterI:'العلاقة بين الإشغال والمبيعات <b>ليست</b> طردية دائماً — يتوسطها <b>سعر الليلة</b>. Alarid-K10: إشغال 45% لكن 54,801 ريال (سعر 677)؛ Taleed-E32: إشغال 98% لكن سعر 268.',
+   tableT:'تفصيل أداء الشقق',tableS:'ابحث، صنّف حسب النمط، رتّب بالضغط على رأس العمود',search:'🔎 ابحث…',allPat:'كل الأنماط',countU:'شقة',
+   cUnit:'الشقة',cProj:'المشروع',cCity:'المدينة',cOcc:'الإشغال%',cSales:'المبيعات',cNet:'الصافي',cAdr:'سعر الليلة',cPat:'النمط',
+   occSampleT:'الشقق الأعلى إشغالاً (عينة)',
+   netT:'ربحية القنوات (إجمالي ← عمولات ← صافي)',netS:'الصافي = المبيعات − عمولة القناة − الضريبة',marginT:'هامش الربح الصافي حسب القناة (%)',
+   netInsight:'<b>Manual-Ejar</b> الأعلى هامشاً (~97%، إقامات طويلة وعمولات ضئيلة)، بينما <b>Airbnb</b> يتصدّر الحجم لكن بعمولة ~15%. قيّم القنوات بالصافي لا بالإجمالي.',
+   canT:'الإلغاءات',canMonthT:'الإلغاءات حسب الشهر',canChanT:'حسب القناة',canCityT:'حسب المدينة',
+   canI:'<b>Booking.com</b> تتصدّر الإلغاءات رغم قلة حجوزاتها مقارنة بـAirbnb — راجع سياسة الدفع المسبق/الإلغاء.',
+   recsT:'توصيات مبنية على البيانات',
+   recs:[['up','📈','ارفع أسعار الوحدات مرتفعة الإشغال منخفضة السعر','الوحدات فوق 85% إشغالاً وسعر ليلتها أقل من المتوسط (467) تحتمل رفعاً 10–15% دون تأثير كبير في الطلب.'],
+        ['up','🕌','المدينة المنورة في رمضان: ارفع السعر وسوّق','إشغال المدينة يثبت وسعر ليلتها يرتفع ~30% في رمضان. ارفع الأسعار 20–30% وكثّف التسويق لطلب العمرة.'],
+        ['down','🏙️','الرياض في رمضان: اخفض السعر أو قدّم عروضاً','إشغال الرياض ينهار (−33 نقطة، p<0.001). اخفض الأسعار 15–20% أو قدّم عروضاً لتعويض الطلب.'],
+        ['up','🎯','سعّر على الأحداث الفعلية','أيام الأحداث تبيع 36% أكثر يومياً (p<0.001). ارفع الأسعار 15–20% للوحدات القوية في أيام الأحداث.'],
+        ['warn','🔁','قلّل إلغاءات Booking.com','Booking.com تتصدّر الإلغاءات (~497 ألف ريال معرّضة للخطر). اشترط الدفع المسبق أو شروط إلغاء أصرم.'],
+        ['up','💰','فضّل القنوات مرتفعة الهامش','Manual-Ejar يربح صافياً ~97% مقابل ~70% لـAirbnb. نمِّ الإقامات الطويلة والقنوات المباشرة لرفع صافي الربح.']],
+   footer:'أُعدّت من بيانات الحجوزات الفعلية (يناير–يونيو 2026) · جامعة الزعيم الأزهري — كلية علوم الحاسوب وتقانة المعلومات · إعداد وضاح الحاج'},
+};
 
-function toggleLang(){ lang=lang==='en'?'ar':'en'; document.getElementById('langbtn').textContent=lang==='en'?'العربية':'English';
-  document.documentElement.lang=lang; document.documentElement.dir=L().dir; render(); }
+let lang='en',page=0,charts=[],fcity='all',fmonth='all';
+const L=()=>I18N[lang];
+const mlabels=()=>MONTHS[lang];
+const cities=()=>['Riyadh','Al-madinah'];
+function destroy(){charts.forEach(c=>c.destroy());charts=[]}
+function mk(id,cfg){const c=new Chart(document.getElementById(id),cfg);charts.push(c);return c}
 
-function kpiCard(cls,val,label){return `<div class="kpi ${cls}"><div class="v">${val}</div><div class="l">${label}</div></div>`;}
+// ----- filtering / aggregation from granular records -----
+function recs(){return D.records.filter(r=>(fcity==='all'||r.city===fcity)&&(fmonth==='all'||r.month==+fmonth))}
+function sum(a,k){return a.reduce((s,x)=>s+x[k],0)}
+function selCities(){return fcity==='all'?cities():[fcity]}
+function selMonths(){return fmonth==='all'?[1,2,3,4,5,6]:[+fmonth]}
+function avail(){let a=0;for(const c of selCities())for(const m of selMonths())a+=(D.op_count[c+'|'+m]||0)*D.dim[m-1];return a}
+function unitsF(){return D.units.filter(u=>(fcity==='all'||u.city===fcity)&&(fmonth==='all'||u.months.includes(+fmonth)))}
+function kpis(){const R=recs();const s=sum(R,'sales'),n=sum(R,'nights'),fee=sum(R,'fee'),vat=sum(R,'vat');
+  const av=avail();return{sales:s,nights:n,occ:av?n/av*100:0,adr:n?s/n:0,net:s-fee-vat,fee:fee,
+    units:new Set(R.map(r=>r.city)).size?unitsF().length:0,margin:s?(s-fee-vat)/s*100:0}}
+function byMonth(){return D.months.map((lab,i)=>{const m=i+1;const R=D.records.filter(r=>r.month===m&&(fcity==='all'||r.city===fcity));
+  const av=selCities().reduce((a,c)=>a+(D.op_count[c+'|'+m]||0)*D.dim[i],0);
+  return{lab:mlabels()[i],sales:sum(R,'sales'),occ:av?sum(R,'nights')/av*100:0}})}
+function byChannel(){const g={};recs().forEach(r=>{const k=r.channel;g[k]=g[k]||{sales:0,fee:0,vat:0,nights:0};g[k].sales+=r.sales;g[k].fee+=r.fee;g[k].vat+=r.vat;g[k].nights+=r.nights});
+  return Object.entries(g).map(([name,v])=>({name,sales:v.sales,fee:v.fee,vat:v.vat,net:v.sales-v.fee-v.vat,margin:v.sales?(v.sales-v.fee-v.vat)/v.sales*100:0})).filter(c=>c.sales>0).sort((a,b)=>b.sales-a.sales)}
 
-function chanRows(key){return D.channels.filter(c=>c[key]>0).sort((a,b)=>b[key]-a[key]).slice(0,7);}
+function toggleLang(){lang=lang==='en'?'ar':'en';document.getElementById('langbtn').textContent=lang==='en'?'العربية':'English';
+  document.documentElement.lang=lang;document.documentElement.dir=L().dir;buildFilters();render()}
+function setFilter(){fcity=document.getElementById('fCity').value;fmonth=document.getElementById('fMonth').value;render()}
+function buildFilters(){const t=L();document.getElementById('lblCity').textContent=t.city+':';document.getElementById('lblMonth').textContent=t.month+':';
+  document.getElementById('fCity').innerHTML=`<option value="all">${t.all}</option>`+cities().map(c=>`<option value="${c}" ${c===fcity?'selected':''}>${CITY[lang][c]}</option>`).join('');
+  document.getElementById('fMonth').innerHTML=`<option value="all">${t.all}</option>`+mlabels().map((m,i)=>`<option value="${i+1}" ${(i+1)==fmonth?'selected':''}>${m}</option>`).join('');}
+function go(i){page=i;render();window.scrollTo(0,0)}
+function kpiCard(cls,v,l){return `<div class="kpi ${cls}"><div class="v">${v}</div><div class="l">${l}</div></div>`}
 
-function render(){
-  const t=L();
-  document.getElementById('h-title').textContent=t.title;
-  document.getElementById('h-sub').textContent=t.sub;
+function render(){const t=L();
+  document.getElementById('h-title').textContent=t.title;document.getElementById('h-sub').textContent=t.sub;
   document.getElementById('footer').textContent=t.footer;
   document.getElementById('nav').innerHTML=t.nav.map((n,i)=>`<button class="${i===page?'active':''}" onclick="go(${i})">${n}</button>`).join('');
-  destroyCharts();
-  const pages=[pageOverview,pageSales,pageOccupancy,pageEvents,pagePricing,pageCancel];
-  document.getElementById('content').innerHTML=`<div class="page active">${pages[page].html()}</div>`;
-  pages[page].draw();
-}
-function go(i){page=i;render();window.scrollTo(0,0);}
-
-// ---------- charts helpers ----------
-function monthlyChart(id){
-  mk(document.getElementById(id),{data:{labels:mlabels(),datasets:[
-    {type:'bar',label:L().salesBar,data:D.monthly.map(m=>m.sales),backgroundColor:D.monthly.map((m,i)=>i===0?C.green:C.blue),yAxisID:'y',borderRadius:5},
-    {type:'line',label:L().occLine,data:D.monthly.map(m=>m.occ),borderColor:C.orange,backgroundColor:C.orange,yAxisID:'y1',tension:.3,pointRadius:4,borderWidth:3}]},
-   options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},
-    scales:{y:{position:'right',ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}});
-}
-function topChart(id){
-  const t=[...D.units].sort((a,b)=>b.sales-a.sales).slice(0,10).reverse();
-  mk(document.getElementById(id),{type:'bar',data:{labels:t.map(u=>u.unit),datasets:[{label:L().sales,data:t.map(u=>u.sales),backgroundColor:C.green,borderRadius:4}]},
-   options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(v/1000)+'k'}}}}});
+  const cl=fcity==='all'?t.all:CITY[lang][fcity];const ml=fmonth==='all'?t.all:mlabels()[+fmonth-1];
+  document.getElementById('filterChip').textContent=`${t.showing}: ${cl} · ${ml}`;
+  destroy();
+  const P=[pOverview,pSales,pOcc,pEvents,pPricing,pNet,pCancel,pRecs];
+  document.getElementById('content').innerHTML=P[page].html();P[page].draw();
 }
 
-// ---------- pages ----------
-const pageOverview={html(){const t=L(),k=D.kpi;return `
-  <div class="kpis">
-   ${kpiCard('',fmt(k.sales)+' '+t.sar,t.kpi.sales)}
-   ${kpiCard('g',k.occ+'%',t.kpi.occ)}
-   ${kpiCard('o',fmt(k.adr)+' '+t.sar,t.kpi.adr)}
-   ${kpiCard('t',k.units,t.kpi.units)}
-   ${kpiCard('p',fmt(k.bookings),t.kpi.bookings)}
-   ${kpiCard('r',fmt(k.cancel),t.kpi.cancel)}
-  </div>
-  <div class="card full"><h3>${t.monthlyTitle}</h3><div class="sub">${t.monthlySub}</div><div class="chartbox tall"><canvas id="ovMonthly"></canvas></div></div>`;},
-  draw(){monthlyChart('ovMonthly');}};
+// ---- chart builders ----
+function monthlyChart(id){const m=byMonth();
+  mk(id,{data:{labels:m.map(x=>x.lab),datasets:[
+    {type:'bar',label:L().salesBar,data:m.map(x=>x.sales),backgroundColor:C.blue,borderRadius:5,yAxisID:'y'},
+    {type:'line',label:L().occLine,data:m.map(x=>x.occ),borderColor:C.orange,backgroundColor:C.orange,yAxisID:'y1',tension:.3,pointRadius:4,borderWidth:3}]},
+   options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'right',ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}})}
+function cityOcc(id){const t=L();mk(id,{type:'bar',data:{labels:D.ramadan_city.map(c=>CITY[lang][c.city]),datasets:[
+   {label:t.normalP,data:D.ramadan_city.map(c=>c.norm_occ),backgroundColor:C.blue,borderRadius:5},
+   {label:t.ramadanP,data:D.ramadan_city.map(c=>c.ram_occ),backgroundColor:C.orange,borderRadius:5}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:0,max:80}}}})}
+function topChart(id){const t=unitsF().sort((a,b)=>b.sales-a.sales).slice(0,10).reverse();
+  mk(id,{type:'bar',data:{labels:t.map(u=>u.unit),datasets:[{label:L().sales,data:t.map(u=>u.sales),backgroundColor:C.green,borderRadius:4}]},
+   options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(v/1000)+'k'}}}}})}
 
-const pageSales={html(){const t=L();return `
-  <div class="card full"><h3>${t.monthlyTitle}</h3><div class="sub">${t.monthlySub}</div><div class="chartbox"><canvas id="sMonthly"></canvas></div></div>
-  <div class="grid">
-   <div class="card"><h3>${t.chanSTitle}</h3><div class="sub">${t.chanSSub}</div><div class="chartbox"><canvas id="sChan"></canvas></div></div>
-   <div class="card"><h3>${t.topTitle}</h3><div class="sub">${t.topSub}</div><div class="chartbox"><canvas id="sTop"></canvas></div></div>
-  </div>`;},
-  draw(){monthlyChart('sMonthly');
-   const cs=chanRows('sales');
-   mk(document.getElementById('sChan'),{type:'bar',data:{labels:cs.map(c=>c.name),datasets:[{label:L().sales,data:cs.map(c=>c.sales),backgroundColor:C.green,borderRadius:4}]},
-     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(v/1000)+'k'}}}}});
-   topChart('sTop');}};
-
-const pageOccupancy={html(){const t=L();return `
-  <div class="card full"><h3>${t.monthlyTitle}</h3><div class="sub">${t.occLine}</div><div class="chartbox"><canvas id="oMonthly"></canvas></div></div>
-  <div class="grid">
-   <div class="card"><h3>${t.occCityTitle}</h3><div class="sub">${t.occCitySub}</div><div class="chartbox"><canvas id="oCity"></canvas></div></div>
-   <div class="card"><h3>${t.occSampleTitle}</h3><div class="sub">${t.occCol}</div><div class="chartbox"><canvas id="oSample"></canvas></div></div>
-  </div>`;},
-  draw(){
-   mk(document.getElementById('oMonthly'),{type:'bar',data:{labels:mlabels(),datasets:[{label:L().occLine,data:D.monthly.map(m=>m.occ),backgroundColor:C.blue,borderRadius:5}]},
-     options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}});
-   cityOccChart('oCity');
-   const s=[...D.units].sort((a,b)=>b.occ-a.occ).slice(0,10).reverse();
-   mk(document.getElementById('oSample'),{type:'bar',data:{labels:s.map(u=>u.unit),datasets:[{label:L().occCol,data:s.map(u=>u.occ),backgroundColor:C.teal,borderRadius:4}]},
-     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:100}}}});}};
-
-function cityOccChart(id){const t=L();const rc=D.ramadan_city;
-  mk(document.getElementById(id),{type:'bar',data:{labels:rc.map(c=>CITY[lang][c.city]||c.city),datasets:[
-    {label:t.normalP,data:rc.map(c=>c.norm_occ),backgroundColor:C.blue,borderRadius:5},
-    {label:t.ramadanP,data:rc.map(c=>c.ram_occ),backgroundColor:C.orange,borderRadius:5}]},
-   options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:0,max:80,title:{display:true,text:t.occCol}}}}});}
-
-const pageEvents={html(){const t=L();return `
-  <div class="card full"><h3>${t.daytypeTitle}</h3><div class="sub">${t.daytypeSub}</div><div class="chartbox"><canvas id="eDay"></canvas></div></div>
-  <div class="card full"><h3>⭐ ${t.ramTitle}</h3><div class="sub">${t.occCitySub}</div>
-    <div class="chartbox"><canvas id="eCity"></canvas></div>
-    <div class="insight">${t.ramInsight}</div></div>`;},
-  draw(){const t=L();const dt=D.daytype;const cats=[['Event',C.green],['Normal',C.blue],['Ramadan',C.orange]];
+const pOverview={html(){const t=L(),k=kpis();return `<div class="kpis">
+  ${kpiCard('',fmt(k.sales)+' '+t.sar,t.kSales)}${kpiCard('g',k.occ.toFixed(1)+'%',t.kOcc)}${kpiCard('o',fmt(k.adr)+' '+t.sar,t.kAdr)}
+  ${kpiCard('t',k.units,t.kUnits)}${kpiCard('p',fmt(k.nights),t.kNights)}${kpiCard('r',fmt(k.net)+' '+t.sar,t.kNet)}</div>
+  <div class="card full"><h3>${t.monthlyT}</h3><div class="sub">${t.monthlyS}</div><div class="chartbox tall"><canvas id="ovM"></canvas></div></div>`},draw(){monthlyChart('ovM')}};
+const pSales={html(){const t=L();return `<div class="card full"><h3>${t.monthlyT}</h3><div class="sub">${t.monthlyS}</div><div class="chartbox"><canvas id="sM"></canvas></div></div>
+  <div class="grid"><div class="card"><h3>${t.chanST}</h3><div class="chartbox"><canvas id="sC"></canvas></div></div>
+  <div class="card"><h3>${t.topT}</h3><div class="chartbox"><canvas id="sT"></canvas></div></div></div>`},
+  draw(){monthlyChart('sM');const c=byChannel().slice(0,7);
+   mk('sC',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[{data:c.map(x=>x.sales),backgroundColor:C.green,borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(v/1000)+'k'}}}}});topChart('sT')}};
+const pOcc={html(){const t=L();return `<div class="card full"><h3>${t.monthlyT}</h3><div class="sub">${t.occLine}</div><div class="chartbox"><canvas id="oM"></canvas></div></div>
+  <div class="grid"><div class="card"><h3>${t.occCityT}</h3><div class="sub">${t.occCityS}</div><div class="chartbox"><canvas id="oC"></canvas></div></div>
+  <div class="card"><h3>${t.occSampleT}</h3><div class="chartbox"><canvas id="oS"></canvas></div></div></div>`},
+  draw(){const m=byMonth();mk('oM',{type:'bar',data:{labels:m.map(x=>x.lab),datasets:[{label:L().occLine,data:m.map(x=>x.occ),backgroundColor:C.blue,borderRadius:5}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}});
+   cityOcc('oC');const s=unitsF().sort((a,b)=>b.occ-a.occ).slice(0,10).reverse();
+   mk('oS',{type:'bar',data:{labels:s.map(u=>u.unit),datasets:[{data:s.map(u=>u.occ),backgroundColor:C.teal,borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:100}}}})}};
+const pEvents={html(){const t=L();return `<div class="card full"><h3>${t.daytypeT}</h3><div class="sub">${t.daytypeS}</div><div class="chartbox"><canvas id="eD"></canvas></div></div>
+  <div class="card full"><h3>⭐ ${t.ramT}</h3><div class="sub">${t.occCityS}</div><div class="chartbox"><canvas id="eC"></canvas></div><div class="insight">${t.ramI}</div></div>`},
+  draw(){const t=L(),dt=D.daytype,cats=[['Event',C.green],['Normal',C.blue],['Ramadan',C.orange]];
    const labels={en:['Real Events','Ordinary Days','Ramadan'],ar:['أحداث فعلية','أيام عادية','رمضان']}[lang];
-   mk(document.getElementById('eDay'),{data:{labels,datasets:[
-     {type:'bar',label:t.avgDaily,data:cats.map(c=>dt[c[0]].avg_sales),backgroundColor:cats.map(c=>c[1]),yAxisID:'y',borderRadius:5},
+   mk('eD',{data:{labels,datasets:[{type:'bar',label:t.avgDaily,data:cats.map(c=>dt[c[0]].avg_sales),backgroundColor:cats.map(c=>c[1]),yAxisID:'y',borderRadius:5},
      {type:'line',label:t.occLine,data:cats.map(c=>dt[c[0]].occ),borderColor:C.red,backgroundColor:C.red,yAxisID:'y1',tension:.3,pointRadius:5,borderWidth:3}]},
-     options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'right',ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}});
-   cityOccChart('eCity');}};
+     options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{position:'right',ticks:{callback:v=>(v/1000)+'k'}},y1:{position:'left',min:0,max:100,grid:{drawOnChartArea:false}}}}});cityOcc('eC')}};
+const pPricing={html(){const t=L();return `<div class="card full"><h3>⭐ ${t.scatterT}</h3><div class="sub">${t.scatterS}</div>
+  <div class="legend2"><span><i class="dot" style="background:${C.red}"></i>${t.patHi}</span><span><i class="dot" style="background:${C.green}"></i>${t.patLo}</span><span><i class="dot" style="background:${C.grey}"></i>${t.patMid}</span></div>
+  <div class="chartbox tall"><canvas id="pS"></canvas></div><div class="insight">${t.scatterI}</div></div>
+  <div class="card full"><h3>${t.tableT}</h3><div class="sub">${t.tableS}</div>
+   <div class="controls"><input type="search" id="q" placeholder="${t.search}"><select class="tbl" id="fp"><option value="">${t.allPat}</option>
+     <option value="low_occ_high_price">${t.patHi}</option><option value="high_occ_low_price">${t.patLo}</option><option value="balanced">${t.patMid}</option></select><span id="cnt" style="color:var(--muted);font-size:13px"></span></div>
+   <div class="tablewrap"><table id="tb"><thead><tr><th data-k="unit">${t.cUnit}</th><th data-k="project">${t.cProj}</th><th data-k="city">${t.cCity}</th>
+     <th data-k="occ">${t.cOcc}</th><th data-k="sales">${t.cSales}</th><th data-k="net">${t.cNet}</th><th data-k="adr">${t.cAdr}</th><th data-k="pattern">${t.cPat}</th></tr></thead><tbody></tbody></table></div></div>`},
+  draw(){const t=L();const col=p=>p==='low_occ_high_price'?C.red:p==='high_occ_low_price'?C.green:C.grey;
+   const U=unitsF();const bub=U.map(u=>({x:u.occ,y:u.adr,r:Math.max(4,Math.sqrt(u.sales)/20),unit:u.unit,sales:u.sales,pat:u.pattern}));
+   mk('pS',{type:'bubble',data:{datasets:[{data:bub,backgroundColor:bub.map(b=>col(b.pat)+'cc'),borderColor:'#555',borderWidth:.5}]},
+     options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const b=c.raw;return `${b.unit}: ${b.x}% · ADR ${b.y} · ${fmt(b.sales)}`}}}},scales:{x:{title:{display:true,text:t.cOcc},min:0,max:100},y:{title:{display:true,text:t.cAdr},min:180}}}});
+   const pl={low_occ_high_price:[t.patHi,'b-hi'],high_occ_low_price:[t.patLo,'b-lo'],balanced:[t.patMid,'b-mid']};
+   let sk='sales',sd=-1;const tb=document.querySelector('#tb tbody');
+   function rt(){const q=(document.getElementById('q').value||'').toLowerCase();const fp=document.getElementById('fp').value;
+     let rows=U.filter(u=>(!q||u.unit.toLowerCase().includes(q)||(u.project||'').toLowerCase().includes(q))&&(!fp||u.pattern===fp));
+     rows.sort((a,b)=>{const x=a[sk],y=b[sk];return(x>y?1:x<y?-1:0)*sd});
+     tb.innerHTML=rows.map(u=>{const p=pl[u.pattern];return `<tr><td><b>${u.unit}</b></td><td>${u.project||''}</td><td>${CITY[lang][u.city]||u.city}</td><td>${u.occ}%</td><td>${fmt(u.sales)}</td><td>${fmt(u.net)}</td><td>${fmt(u.adr)}</td><td><span class="badge ${p[1]}">${p[0]}</span></td></tr>`}).join('');
+     document.getElementById('cnt').textContent=rows.length+' '+t.countU}
+   document.querySelectorAll('#tb th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sd=(sk===k)?-sd:-1;sk=k;rt()});
+   document.getElementById('q').oninput=rt;document.getElementById('fp').onchange=rt;rt()}};
+const pNet={html(){const t=L(),k=kpis();return `<div class="kpis">
+  ${kpiCard('g',fmt(k.net)+' '+t.sar,t.kNet)}${kpiCard('',fmt(k.sales)+' '+t.sar,t.kSales)}${kpiCard('o',fmt(k.fee)+' '+t.sar,t.kFees)}${kpiCard('t',k.margin.toFixed(1)+'%',t.kMargin)}</div>
+  <div class="card full"><h3>${t.netT}</h3><div class="sub">${t.netS}</div><div class="chartbox tall"><canvas id="nC"></canvas></div></div>
+  <div class="card full"><h3>${t.marginT}</h3><div class="chartbox"><canvas id="nM"></canvas></div><div class="insight">${t.netInsight}</div></div>`},
+  draw(){const t=L();const c=byChannel().slice(0,7);
+   mk('nC',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[
+     {label:t.kFees,data:c.map(x=>x.fee+x.vat),backgroundColor:C.red,borderRadius:4,stack:'s'},
+     {label:t.net,data:c.map(x=>x.net),backgroundColor:C.green,borderRadius:4,stack:'s'}]},
+     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true,ticks:{callback:v=>(v/1000)+'k'}},y:{stacked:true}}}});
+   mk('nM',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[{data:c.map(x=>x.margin),backgroundColor:C.teal,borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{max:100,title:{display:true,text:'%'}}}}})}};
+const pCancel={html(){const t=L();return `<div class="kpis">
+  ${kpiCard('r',fmt(D.cancel.total),t.kCancel)}${kpiCard('o',fmt(D.cancel.nights),lang==='ar'?'ليالٍ مفقودة':'Lost nights')}${kpiCard('p','~497k '+t.sar,lang==='ar'?'إيراد معرّض للخطر':'Revenue at risk')}${kpiCard('','10.3%',lang==='ar'?'نسبة الإلغاء':'Cancel rate')}</div>
+  <div class="card full"><h3>${t.canMonthT}</h3><div class="chartbox"><canvas id="cM"></canvas></div></div>
+  <div class="grid"><div class="card"><h3>${t.canChanT}</h3><div class="chartbox"><canvas id="cC"></canvas></div></div>
+  <div class="card"><h3>${t.canCityT}</h3><div class="chartbox"><canvas id="cT"></canvas></div></div></div>
+  <div class="card full"><div class="insight">${t.canI}</div></div>`},
+  draw(){const cc=D.cancel;mk('cM',{type:'bar',data:{labels:mlabels(),datasets:[{data:cc.by_month.map(x=>x[1]),backgroundColor:C.red,borderRadius:5}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+   mk('cC',{type:'bar',data:{labels:cc.by_channel.map(x=>x[0]),datasets:[{data:cc.by_channel.map(x=>x[1]),backgroundColor:C.orange,borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+   mk('cT',{type:'doughnut',data:{labels:cc.by_city.map(x=>CITY[lang][x[0]]||x[0]),datasets:[{data:cc.by_city.map(x=>x[1]),backgroundColor:[C.blue,C.teal]}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}})}};
+const pRecs={html(){const t=L();return `<div class="card full"><h3>${t.recsT}</h3>
+  ${t.recs.map(r=>`<div class="rec ${r[0]}"><div class="ic">${r[1]}</div><div><h4>${r[2]}</h4><p>${r[3]}</p></div></div>`).join('')}</div>`},draw(){}};
 
-const pagePricing={html(){const t=L();return `
-  <div class="card full"><h3>⭐ ${t.scatterTitle}</h3><div class="sub">${t.scatterSub}</div>
-    <div class="legend2">
-      <span><i class="dot" style="background:${C.red}"></i> ${t.patHi}</span>
-      <span><i class="dot" style="background:${C.green}"></i> ${t.patLo}</span>
-      <span><i class="dot" style="background:${C.grey}"></i> ${t.patMid}</span></div>
-    <div class="chartbox tall"><canvas id="pScatter"></canvas></div>
-    <div class="insight">${t.scatterInsight}</div></div>
-  <div class="card full"><h3>${t.tableTitle}</h3><div class="sub">${t.tableSub}</div>
-    <div class="controls">
-      <input type="search" id="q" placeholder="${t.search}">
-      <select id="fpat"><option value="">${t.allPat}</option>
-        <option value="low_occ_high_price">${t.patHi}</option>
-        <option value="high_occ_low_price">${t.patLo}</option>
-        <option value="balanced">${t.patMid}</option></select>
-      <span id="count" style="color:var(--muted);font-size:13px"></span></div>
-    <div class="tablewrap"><table id="tbl"><thead><tr>
-      <th data-k="unit">${t.colUnit}</th><th data-k="project">${t.colProject}</th><th data-k="city">${t.colCity}</th>
-      <th data-k="occ">${t.colOcc}</th><th data-k="sales">${t.colSales}</th><th data-k="adr">${t.colAdr}</th>
-      <th data-k="nights">${t.colNights}</th><th data-k="pattern">${t.colPattern}</th></tr></thead><tbody></tbody></table></div></div>`;},
-  draw(){const t=L();
-   const colByPat=p=>p==='low_occ_high_price'?C.red:p==='high_occ_low_price'?C.green:C.grey;
-   const bub=D.units.map(u=>({x:u.occ,y:u.adr,r:Math.max(4,Math.sqrt(u.sales)/20),unit:u.unit,sales:u.sales,pat:u.pattern}));
-   mk(document.getElementById('pScatter'),{type:'bubble',data:{datasets:[{data:bub,backgroundColor:bub.map(b=>colByPat(b.pat)+'cc'),borderColor:'#555',borderWidth:.5}]},
-     options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const b=c.raw;return `${b.unit}: ${b.x}% · ADR ${b.y} · ${fmt(b.sales)} ${t.sar}`;}}}},
-      scales:{x:{title:{display:true,text:t.colOcc},min:0,max:100},y:{title:{display:true,text:t.colAdr},min:180}}}});
-   const patLabel={low_occ_high_price:[t.patHi,'b-hi'],high_occ_low_price:[t.patLo,'b-lo'],balanced:[t.patMid,'b-mid']};
-   let sortK='sales',sortDir=-1;
-   const tb=document.querySelector('#tbl tbody');
-   function renderT(){const q=(document.getElementById('q').value||'').toLowerCase();const fp=document.getElementById('fpat').value;
-     let rows=D.units.filter(u=>(!q||u.unit.toLowerCase().includes(q)||(u.project||'').toLowerCase().includes(q))&&(!fp||u.pattern===fp));
-     rows.sort((a,b)=>{const x=a[sortK],y=b[sortK];return (x>y?1:x<y?-1:0)*sortDir;});
-     tb.innerHTML=rows.map(u=>{const pl=patLabel[u.pattern];return `<tr><td><b>${u.unit}</b></td><td>${u.project||''}</td><td>${CITY[lang][u.city]||u.city}</td>
-       <td>${u.occ}%</td><td>${fmt(u.sales)}</td><td>${fmt(u.adr)}</td><td>${u.nights}</td><td><span class="badge ${pl[1]}">${pl[0].split('(')[0]}</span></td></tr>`;}).join('');
-     document.getElementById('count').textContent=rows.length+' '+t.countUnit;}
-   document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortDir=(sortK===k)?-sortDir:-1;sortK=k;renderT();});
-   document.getElementById('q').oninput=renderT;document.getElementById('fpat').onchange=renderT;renderT();}};
-
-const pageCancel={html(){const t=L(),k=D.kpi,cc=D.cancel;return `
-  <div class="kpis">
-   ${kpiCard('r',fmt(cc.count),t.canKpiCount)}
-   ${kpiCard('o',fmt(cc.nights),t.canKpiNights)}
-   ${kpiCard('p',fmt(cc.lost_rev)+' '+t.sar,t.canKpiLost)}
-   ${kpiCard('',cc.rate+'%',t.canKpiRate)}
-  </div>
-  <div class="card full"><h3>${t.canMonthTitle}</h3><div class="chartbox"><canvas id="cMonth"></canvas></div></div>
-  <div class="grid">
-   <div class="card"><h3>${t.canChanTitle}</h3><div class="chartbox"><canvas id="cChan"></canvas></div></div>
-   <div class="card"><h3>${t.canCityTitle}</h3><div class="chartbox"><canvas id="cCity"></canvas></div></div>
-  </div>
-  <div class="card full"><div class="insight">${t.canInsight}</div></div>`;},
-  draw(){const t=L(),cc=D.cancel;
-   mk(document.getElementById('cMonth'),{type:'bar',data:{labels:mlabels(),datasets:[{label:t.canKpiCount,data:cc.by_month.map(x=>x[1]),backgroundColor:C.red,borderRadius:5}]},
-     options:{maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-   mk(document.getElementById('cChan'),{type:'bar',data:{labels:cc.by_channel.map(x=>x[0]),datasets:[{data:cc.by_channel.map(x=>x[1]),backgroundColor:C.orange,borderRadius:4}]},
-     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-   mk(document.getElementById('cCity'),{type:'doughnut',data:{labels:cc.by_city.map(x=>CITY[lang][x[0]]||x[0]),datasets:[{data:cc.by_city.map(x=>x[1]),backgroundColor:[C.blue,C.teal]}]},
-     options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});}};
-
-render();
+buildFilters();render();
 </script>
 </body>
 </html>
