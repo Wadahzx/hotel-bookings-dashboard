@@ -219,7 +219,7 @@ const pOcc={html(){const t=L();return `<div class="card full"><h3>${t.monthlyT}<
    mk('oS',{type:'bar',data:{labels:s.map(u=>u.unit),datasets:[{data:s.map(u=>u.occ),backgroundColor:C.teal,borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:100}}}})}};
 const pEvents={html(){const t=L();return `<div class="card full"><h3>${t.daytypeT}</h3><div class="sub">${t.daytypeS}</div><div class="chartbox"><canvas id="eD"></canvas></div></div>
   <div class="card full"><h3>⭐ ${t.ramT}</h3><div class="sub">${t.occCityS}</div><div class="chartbox"><canvas id="eC"></canvas></div><div class="insight">${t.ramI}</div></div>`},
-  draw(){const t=L(),dt=D.daytype,cats=[['Event',C.green],['Normal',C.blue],['Ramadan',C.orange]];
+  draw(){const t=L();const dt=(fcity!=='all'&&D.daytype_city[fcity])?D.daytype_city[fcity]:D.daytype;const cats=[['Event',C.green],['Normal',C.blue],['Ramadan',C.orange]];
    const labels={en:['Real Events','Ordinary Days','Ramadan'],ar:['أحداث فعلية','أيام عادية','رمضان']}[lang];
    mk('eD',{data:{labels,datasets:[{type:'bar',label:t.avgDaily,data:cats.map(c=>dt[c[0]].avg_sales),backgroundColor:cats.map(c=>c[1]),yAxisID:'y',borderRadius:5},
      {type:'line',label:t.occLine,data:cats.map(c=>dt[c[0]].occ),borderColor:C.red,backgroundColor:C.red,yAxisID:'y1',tension:.3,pointRadius:5,borderWidth:3,datalabels:{align:'bottom',offset:10,color:'#fff',backgroundColor:C.red,borderRadius:4,padding:{top:1,bottom:1,left:4,right:4},font:{weight:'bold',size:10}}}]},
@@ -255,15 +255,24 @@ const pNet={html(){const t=L(),k=kpis();return `<div class="kpis">
      {label:t.net,data:c.map(x=>x.net),backgroundColor:C.green,borderRadius:4,stack:'s'}]},
      options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{position:'bottom'},datalabels:{anchor:'center',align:'center',color:'#fff',display:ctx=>ctx.dataset.data[ctx.dataIndex]>=30000}},scales:{x:{stacked:true,ticks:{callback:v=>(v/1000)+'k'}},y:{stacked:true}}}});
    mk('nM',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[{data:c.map(x=>x.margin),backgroundColor:C.teal,borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{max:100,title:{display:true,text:'%'}}}}})}};
-const pCancel={html(){const t=L();return `<div class="kpis">
-  ${kpiCard('r',fmt(D.cancel.total),t.kCancel)}${kpiCard('o',fmt(D.cancel.nights),lang==='ar'?'ليالٍ مفقودة':'Lost nights')}${kpiCard('p','~497k '+t.sar,lang==='ar'?'إيراد معرّض للخطر':'Revenue at risk')}${kpiCard('','10.3%',lang==='ar'?'نسبة الإلغاء':'Cancel rate')}</div>
+// ---- cancellation filtering (respects city + month) ----
+function canrecs(){return D.cancel_records.filter(r=>(fcity==='all'||r.city===fcity)&&(fmonth==='all'||r.month==+fmonth))}
+function canKpis(){const R=canrecs();const count=R.reduce((s,x)=>s+x.count,0),nights=R.reduce((s,x)=>s+x.nights,0);
+  let conf=0;for(const c of selCities())for(const m of selMonths())conf+=(D.book_count[c+'|'+m]||0);
+  return{count,nights,lost:Math.round(nights*D.adr_overall),rate:(count+conf)?count/(count+conf)*100:0}}
+function canByMonth(){return D.months.map((lab,i)=>[lab,D.cancel_records.filter(r=>r.month===i+1&&(fcity==='all'||r.city===fcity)).reduce((s,x)=>s+x.count,0)])}
+function canByChannel(){const g={};canrecs().forEach(r=>g[r.channel]=(g[r.channel]||0)+r.count);return Object.entries(g).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,6)}
+function canByCity(){return['Riyadh','Al-madinah'].map(c=>[c,D.cancel_records.filter(r=>r.city===c&&(fmonth==='all'||r.month==+fmonth)).reduce((s,x)=>s+x.count,0)]).filter(x=>x[1]>0)}
+const pCancel={html(){const t=L(),k=canKpis();return `<div class="kpis">
+  ${kpiCard('r',fmt(k.count),t.kCancel)}${kpiCard('o',fmt(k.nights),lang==='ar'?'ليالٍ مفقودة':'Lost nights')}${kpiCard('p','~'+fmt(k.lost)+' '+t.sar,lang==='ar'?'إيراد معرّض للخطر':'Revenue at risk')}${kpiCard('',k.rate.toFixed(1)+'%',lang==='ar'?'نسبة الإلغاء':'Cancel rate')}</div>
   <div class="card full"><h3>${t.canMonthT}</h3><div class="chartbox"><canvas id="cM"></canvas></div></div>
   <div class="grid"><div class="card"><h3>${t.canChanT}</h3><div class="chartbox"><canvas id="cC"></canvas></div></div>
   <div class="card"><h3>${t.canCityT}</h3><div class="chartbox"><canvas id="cT"></canvas></div></div></div>
   <div class="card full"><div class="insight">${t.canI}</div></div>`},
-  draw(){const cc=D.cancel;mk('cM',{type:'bar',data:{labels:mlabels(),datasets:[{data:cc.by_month.map(x=>x[1]),backgroundColor:C.red,borderRadius:5}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-   mk('cC',{type:'bar',data:{labels:cc.by_channel.map(x=>x[0]),datasets:[{data:cc.by_channel.map(x=>x[1]),backgroundColor:C.orange,borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-   mk('cT',{type:'doughnut',data:{labels:cc.by_city.map(x=>CITY[lang][x[0]]||x[0]),datasets:[{data:cc.by_city.map(x=>x[1]),backgroundColor:[C.blue,C.teal]}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'},datalabels:{anchor:'center',align:'center',color:'#fff',font:{weight:'bold',size:14}}}}})}};
+  draw(){const t=L();const bm=canByMonth(),bc=canByChannel(),bt=canByCity();
+   mk('cM',{type:'bar',data:{labels:bm.map(x=>x[0]),datasets:[{data:bm.map(x=>x[1]),backgroundColor:C.red,borderRadius:5}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+   mk('cC',{type:'bar',data:{labels:bc.map(x=>x[0]),datasets:[{data:bc.map(x=>x[1]),backgroundColor:C.orange,borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+   mk('cT',{type:'doughnut',data:{labels:bt.map(x=>CITY[lang][x[0]]||x[0]),datasets:[{data:bt.map(x=>x[1]),backgroundColor:[C.blue,C.teal]}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'},datalabels:{anchor:'center',align:'center',color:'#fff',font:{weight:'bold',size:14}}}}})}};
 const pRecs={html(){const t=L();return `<div class="card full"><h3>${t.recsT}</h3>
   ${t.recs.map(r=>`<div class="rec ${r[0]}"><div class="ic">${r[1]}</div><div><h4>${r[2]}</h4><p>${r[3]}</p></div></div>`).join('')}</div>`},draw(){}};
 
