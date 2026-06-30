@@ -251,10 +251,10 @@ const pNet={html(){const t=L(),k=kpis();return `<div class="kpis">
   <div class="card full"><h3>${t.marginT}</h3><div class="chartbox"><canvas id="nM"></canvas></div><div class="insight">${t.netInsight}</div></div>`},
   draw(){const t=L();const c=byChannel().slice(0,7);
    mk('nC',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[
-     {label:t.kFees,data:c.map(x=>x.fee+x.vat),backgroundColor:C.red,borderRadius:4,stack:'s'},
-     {label:t.net,data:c.map(x=>x.net),backgroundColor:C.green,borderRadius:4,stack:'s'}]},
-     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{position:'bottom'},datalabels:{anchor:'center',align:'center',color:'#fff',display:ctx=>ctx.dataset.data[ctx.dataIndex]>=30000}},scales:{x:{stacked:true,ticks:{callback:v=>(v/1000)+'k'}},y:{stacked:true}}}});
-   mk('nM',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[{data:c.map(x=>x.margin),backgroundColor:C.teal,borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{max:100,title:{display:true,text:'%'}}}}})}};
+     {label:t.kFees,data:c.map(x=>x.fee+x.vat),backgroundColor:C.red,borderRadius:4,stack:'s',datalabels:{display:false}},
+     {label:t.net,data:c.map(x=>x.net),backgroundColor:C.green,borderRadius:4,stack:'s',datalabels:{anchor:'end',align:'end',color:'#2b3645',font:{weight:'bold',size:10},formatter:v=>(v/1000).toFixed(0)+'k'}}]},
+     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true,grace:'12%',ticks:{callback:v=>(v/1000)+'k'}},y:{stacked:true}}}});
+   mk('nM',{type:'bar',data:{labels:c.map(x=>x.name),datasets:[{data:c.map(x=>x.margin),backgroundColor:C.teal,borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grace:'15%',title:{display:true,text:'%'}}}}})}};
 // ---- cancellation filtering (respects city + month) ----
 function canrecs(){return D.cancel_records.filter(r=>(fcity==='all'||r.city===fcity)&&(fmonth==='all'||r.month==+fmonth))}
 function canKpis(){const R=canrecs();const count=R.reduce((s,x)=>s+x.count,0),nights=R.reduce((s,x)=>s+x.nights,0);
